@@ -19,9 +19,55 @@ const polylineMachine = createMachine(
         /** @xstate-layout N4IgpgJg5mDOIC5gF8A0IB2B7CdGgAcsAbATwBkBLDMfEI2SgF0qwzoA9EBaANnVI9eAOgAM4iZMkB2ZGnokK1MMMoRitJAsYs2nRABYATAMQAOAIzCD0gJwXetgwGZezgw9ty5QA */
         id: "polyLine",
         initial: "idle",
-        states : {
+        states: {
             idle: {
-            }
+                on: {
+                    MOUSECLICK: {
+                        target: "drawing",
+                        actions: {
+                            type: "createLine",
+                        },
+                    },
+                },
+            },
+            drawing: {
+                on: {
+                    MOUSEMOVE: {
+                        target: "drawing",
+                        actions: {
+                            type: "setLastPoint",
+                        },
+                    },
+                    MOUSECLICK: [
+                        {
+                            target: "drawing",
+                            cond: "pasPlein",
+                            actions: {
+                                type: "saveLine",
+                            },
+                        },
+                        {
+                            target: "idle",
+                            actions: {
+                                type: "saveLine",
+                            },
+                        },
+                    ],
+                    Escape: {
+                        target: "idle",
+                        actions: {
+                            type: "abandon",
+                        },
+                    },
+                    BackSpace: {
+                        target: "drawing",
+                        cond: "plusDeDeuxPoints",
+                        actions: {
+                            type: "removeLastPoint",
+                        },
+                    },
+                },
+            },
         }
     },
     // Quelques actions et guardes que vous pouvez utiliser dans votre machine
